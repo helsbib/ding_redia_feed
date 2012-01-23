@@ -7,8 +7,8 @@ function ding_redia_feed_menu() {
   $items = array();
 
   $items['admin/settings/ding_redia_feed'] = array(
-    'title' => 'KDB redia feed settings',
-    'description' => 'Settings for the KDB redia feed module.',
+    'title' => 'Redia feed settings',
+    'description' => 'Settings for the Redia feed module.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('ding_redia_feed_settings_form'),
     'access arguments' => array('access administration pages'),
