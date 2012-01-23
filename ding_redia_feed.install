@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implementation of hook_install().
+ */
+function ding_redia_feed_install() {
+  drupal_install_schema('ding_redia_feed');
+}
+
+/**
+ * Implementation of hook_uninstall().
+ */
+function ding_redia_feed_uninstall() {
+  drupal_uninstall_schema('ding_redia_feed');
+}
+
+
+/**
+ * Implements hook_schema().
+ */
+function ding_redia_feed_schema() {
+  $schema = array();
+  $schema['ding_redia_feed_cat'] = array(
+    'description' => 'Store info about the redia category used to control placement on the redia iPhone app',
+    'fields' => array(
+      'nid' => array(
+        'description' => 'The {node}.nid of the node displayed in the Redia app.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+      ),
+      'category' => array(
+        'desctiption' => 'The Redia category which determines the node placement in the iPhone app.',
+        'type' => 'varchar',
+        'length' => '255',
+        'default' => '',
+        'not null' => TRUE,
+      ),
+    ),
+  );
+
+  return $schema;
+}

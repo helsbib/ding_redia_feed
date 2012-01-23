@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function ding_redia_feed_menu() {
+  $items = array();
+
+  $items['admin/settings/ding_redia_feed'] = array(
+    'title' => 'KDB redia feed settings',
+    'description' => 'Settings for the KDB redia feed module.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ding_redia_feed_settings_form'),
+    'access arguments' => array('access administration pages'),
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_perm().
+ */
+function ding_redia_feed_perm() {
+  return array('input redia app setting for nodes');
+}
+
+/**
+ * General settings form.
+ */
+function ding_redia_feed_settings_form() {
+  $form = array();
+  $form['ding_redia_feed_nodes'] = array(
+    '#options' => node_get_types('names'),
+    '#type' => 'checkboxes',
+    '#default_value' => variable_get('ding_redia_feed_nodes', array()),
+    '#title' => t('Select which node types that should use the redia app category'),
+  );
+
+  return system_settings_form($form);
+}
+
+/**
+ * Utility function to get the possible node app plaement options.
+ */
+function ding_redia_feed_categories() {
+  return array(
+    '' => 'Standard liste visning',
+    'bahgf' => 'Mobil app kvadrat 1 (Øverste venstre)',
+    'bahgg' => 'Mobil app kvadrat 2 (Øverste højre)',
+    'bahgh' => 'Mobil app kvadrat 3 (Nederste venstre)',
+    'bahgi' => 'Mobil app kvadrat 4 (Nederste højre)',
+  );
+}
+
+/**
+ * Implements hook_nodeapi().
+ */
+function ding_redia_feed_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  switch ($op) {
+    case 'load':
+      $cat = db_result(db_query('SELECT category FROM {ding_redia_feed_cat} WHERE nid = %d', $node->nid));
+      $node->ding_redia_feed_cat = $cat ? $cat : '';
+      break;
+    case 'insert':
+      if (!empty($node->ding_redia_feed_cat)) {
+        $record = array('nid' => $node->nid, 'category' => $node->ding_redia_feed_cat);
+        drupal_write_record('ding_redia_feed_cat', $record);
+      }
+      break;
+    case 'update':
+      if (!empty($node->ding_redia_feed_cat)) {
+        db_query("UPDATE {ding_redia_feed_cat} SET category = '%s' WHERE nid = %d;", $node->ding_redia_feed_cat, $node->nid);
+        if (!db_affected_rows()) {
+          $record = array('nid' => $node->nid, 'category' => $node->ding_redia_feed_cat);
+          drupal_write_record('ding_redia_feed_cat', $record);
+        }
+      }
+      break;
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function ding_redia_feed_form_alter(&$form, &$form_state, $form_id) {
+  if (strpos($form_id, 'node_form') !== FALSE) {
+    if (in_array($form['#node']->type, array_filter(variable_get('ding_redia_feed_nodes', array())))) {
+      $form['ding_redia_feed_cat'] = array(
+        '#type' => 'select',
+        '#title' => t('Select iPhone app placement'),
+        '#options' => ding_redia_feed_categories(),
+        '#default_value' => !empty($form['#node']->ding_redia_feed_cat) ? $form['#node']->ding_redia_feed_cat : '',
+        '#access' => user_access('input redia app setting for nodes'),
+      );
+    }
+  }
+}
+
+/**
+ * Implementation of hook_views_plugins
+ */
+function ding_redia_feed_views_plugins() {
+  return array(
+    'module' => 'views',
+    'row' => array(
+      'ding_redia_rss' => array(
+        'title' => t('Redia node'),
+        'help' => t('Display the node with standard special redia rss format.'),
+        'handler' => 'ding_redia_feed_plugin_row_node_rss',
+        'path' => drupal_get_path('module', 'ding_redia_feed') . '/plugins',
+        'parent' => 'node_rss',
+        'theme' => 'views_view_row_rss',
+        'base' => array('node'), // only works with 'node' as base.
+        'uses options' => TRUE,
+        'type' => 'feed',
+        'help topic' => 'style-node-rss',
+      ),
+    ),
+  );
+}
+
+include_once('ding_redia_feed.features.inc');
