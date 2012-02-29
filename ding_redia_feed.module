@@ -33,7 +33,7 @@ function ding_redia_feed_settings_form() {
     '#options' => node_get_types('names'),
     '#type' => 'checkboxes',
     '#default_value' => variable_get('ding_redia_feed_nodes', array()),
-    '#title' => t('Select which node types that should use the redia app category'),
+    '#title' => t('Select which node types that should use the Redia app category'),
   );
 
   // Transform the user categories data structure into something user editable
@@ -132,7 +132,7 @@ function ding_redia_feed_form_alter(&$form, &$form_state, $form_id) {
     if (in_array($form['#node']->type, array_filter(variable_get('ding_redia_feed_nodes', array())))) {
       $form['ding_redia_feed_cat'] = array(
         '#type' => 'select',
-        '#title' => t('Select iPhone app placement'),
+        '#title' => t('Select Redia app placement'),
         '#options' => ding_redia_feed_app_categories(),
         '#default_value' => !empty($form['#node']->ding_redia_feed_cat) ? $form['#node']->ding_redia_feed_cat : '',
         '#access' => user_access('input redia app setting for nodes'),
