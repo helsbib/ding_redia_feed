@@ -36,19 +36,64 @@ function ding_redia_feed_settings_form() {
     '#title' => t('Select which node types that should use the redia app category'),
   );
 
+  // Transform the user categories data structure into something user editable
+  // for the form in the format id|description
+  $categories = ding_redia_feed_user_categories();
+  foreach ($categories as $id => &$description) {
+    $description = $id . '|' . $description;
+  }
+  $categories = implode("\n", $categories);
+
+  $form['ding_redia_feed_categories'] = array(
+    '#type' => 'textarea',
+    '#title' => t('App content positions'),
+    '#description' => t('Enter the positions used by the Redia app. Enter one position per line and separate id and description with a | e.g. "bahgf|Mobile app quadrant 1 (Upper left)"'),
+    '#default_value' => $categories,
+  );
+
   return system_settings_form($form);
+}
+
+/**
+ * Settings form validation.
+ */
+function ding_redia_feed_settings_form_validate($form, &$form_state) {
+  // Transform the user submitted data into the category data structure
+  // array('id' => 'description')
+  $values = explode("\n", $form_state['values']['ding_redia_feed_categories']);
+
+  $categories = array();
+  foreach ($values as &$category_string) {
+    $category_values = explode('|', $category_string);
+    $categories[trim($category_values[0])] = trim($category_values[1]);
+  }
+  
+  $form_state['values']['ding_redia_feed_categories'] = $categories;
 }
 
 /**
  * Utility function to get the possible node app plaement options.
  */
-function ding_redia_feed_categories() {
-  return array(
-    '' => 'Standard liste visning',
-    'bahgf' => 'Mobil app kvadrat 1 (Øverste venstre)',
-    'bahgg' => 'Mobil app kvadrat 2 (Øverste højre)',
-    'bahgh' => 'Mobil app kvadrat 3 (Nederste venstre)',
-    'bahgi' => 'Mobil app kvadrat 4 (Nederste højre)',
+function ding_redia_feed_app_categories() {
+  return array_merge(
+      // Always allow standard list view
+      array('' => t('Standard list view')),
+      ding_redia_feed_user_categories()
+  );
+}
+
+/**
+ * Utility function to get the user configurable node app plaement options.
+ */
+function ding_redia_feed_user_categories() {
+  return variable_get('ding_redia_feed_categories', 
+    // Default values are based on the Copenhagen Ding site/app
+    array(
+      'bahgf' => 'Mobil app kvadrat 1 (Øverste venstre)',
+      'bahgg' => 'Mobil app kvadrat 2 (Øverste højre)',
+      'bahgh' => 'Mobil app kvadrat 3 (Nederste venstre)',
+      'bahgi' => 'Mobil app kvadrat 4 (Nederste højre)',
+    )
   );
 }
 
@@ -88,7 +133,7 @@ function ding_redia_feed_form_alter(&$form, &$form_state, $form_id) {
       $form['ding_redia_feed_cat'] = array(
         '#type' => 'select',
         '#title' => t('Select iPhone app placement'),
-        '#options' => ding_redia_feed_categories(),
+        '#options' => ding_redia_feed_app_categories(),
         '#default_value' => !empty($form['#node']->ding_redia_feed_cat) ? $form['#node']->ding_redia_feed_cat : '',
         '#access' => user_access('input redia app setting for nodes'),
       );
