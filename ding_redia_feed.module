@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Missing description.
+ */
+
+/**
  * Implements hook_menu().
  */
 function ding_redia_feed_menu() {
@@ -67,7 +72,7 @@ function ding_redia_feed_settings_form_validate($form, &$form_state) {
     $category_values = explode('|', $category_string);
     $categories[trim($category_values[0])] = trim($category_values[1]);
   }
-  
+
   $form_state['values']['ding_redia_feed_categories'] = $categories;
 }
 
@@ -86,7 +91,7 @@ function ding_redia_feed_app_categories() {
  * Utility function to get the user configurable node app plaement options.
  */
 function ding_redia_feed_user_categories() {
-  return variable_get('ding_redia_feed_categories', 
+  return variable_get('ding_redia_feed_categories',
     // Default values are based on the Copenhagen Ding site/app
     array(
       'bahgf' => 'Mobil app kvadrat 1 (Øverste venstre)',
@@ -142,7 +147,7 @@ function ding_redia_feed_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implementation of hook_views_plugins
+ * Implementation of hook_views_plugins().
  */
 function ding_redia_feed_views_plugins() {
   return array(

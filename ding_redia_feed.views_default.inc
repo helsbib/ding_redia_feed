@@ -1,6 +1,11 @@
 <?php
 
 /**
+ * @file
+ * Missing description.
+ */
+
+/**
  * Implementation of hook_views_default_views().
  */
 function ding_redia_feed_views_default_views() {
@@ -822,7 +827,7 @@ function ding_redia_feed_views_default_views() {
   $handler->override_option('style_plugin', 'rss');
   $handler->override_option('style_options', array(
     'mission_description' => 0,
-    'description' => 'Udvalgt indhold fra bibliotek.kk.dk',
+    'description' => 'Udvalgt indhold fra biblioteket',
   ));
   $handler->override_option('row_plugin', 'node_rss');
   $handler->override_option('row_options', array(
