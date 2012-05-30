@@ -1,11 +1,6 @@
 <?php
 
 /**
- * @file
- * Missing description.
- */
-
-/**
  * Implementation of hook_views_api().
  */
 function ding_redia_feed_views_api() {
