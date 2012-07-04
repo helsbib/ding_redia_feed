@@ -158,9 +158,6 @@ class ding_redia_feed_plugin_row_node_rss extends views_plugin_row_node_rss {
         break;
       case 'teaser':
         $item->description = $node->teaser;
-        if (!empty($item->readmore)) {
-          $item->description .= '<p>' . l(t('read more'), 'node/' . $item->nid, array('absolute' => TRUE, 'attributes' => array('target' => '_blank'))) . '</p>';
-        }
         break;
       case 'title':
         $item->description = '';
